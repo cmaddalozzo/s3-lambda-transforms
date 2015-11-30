@@ -20,12 +20,14 @@ var s3 = new AWS.S3();
 exports.handler = function(event, context) {
   "use strict";
   // Read options from the event.
-  console.log('Starting image processing...');
-  var srcBucket = event.Records[0].s3.bucket.name;
+  console.log('Starting image processing.');
+  var bucket = event.Records[0].s3.bucket.name;
   // Object key may have spaces or unicode non-ASCII characters.
   var srcKey =
     decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
 
+  // Sanity check to make sure key starts with "orig/". Lambda function should
+  // be set up with 'orig/' as key prefix to make this unnecessary.
   if(!/^orig\//.test(srcKey)){
     console.error('Key doesn\'t match expected format:' + srcKey);
     return;
@@ -50,7 +52,7 @@ exports.handler = function(event, context) {
     function download(next) {
       // Download the image from S3 into a buffer.
       s3.getObject({
-          Bucket: srcBucket,
+          Bucket: bucket,
           Key: srcKey
         },
         next);
@@ -97,12 +99,12 @@ exports.handler = function(event, context) {
     ], function (err) {
       if (err) {
         console.error(
-          'Unable to resize ' + srcBucket + '/' + srcKey +
+          'Unable to transform ' + bucket + '/' + srcKey +
           ' due to an error: ' + err
         );
       } else {
         console.log(
-          'Successfully resized ' + srcBucket + '/' + srcKey + '.'
+          'Successfully resized ' + bucket + '/' + srcKey + '.'
         );
       }
       context.done();

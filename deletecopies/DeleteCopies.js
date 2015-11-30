@@ -1,10 +1,8 @@
-// dependencies
 var async = require('async');
 var AWS = require('aws-sdk');
 
 var sizes = ['small', 'medium', 'large'];
 
-// get reference to S3 client 
 var s3 = new AWS.S3();
  
 exports.handler = function(event, context) {
@@ -16,7 +14,8 @@ exports.handler = function(event, context) {
   var srcKey =
     decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
 
-  // Sanity check to make sure key starts with "orig/".
+  // Sanity check to make sure key starts with "orig/". Lambda function should
+  // be set up with 'orig/' as key prefix to make this unnecessary.
   if(!/^orig\//.test(srcKey)){
     console.error('Key doesn\'t match expected format:' + srcKey);
     return;
@@ -24,7 +23,7 @@ exports.handler = function(event, context) {
 
   var baseKey = srcKey.match(/^orig\/(.*)/)[1];
 
-  // Stream the transformed image to a different S3 bucket.
+  // Call a delete for each size.
   async.each(sizes, function(size, cb){
     var key = size + '/' + baseKey;
     console.log('Delete ' + key);
