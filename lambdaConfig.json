@@ -1,0 +1,13 @@
+{
+  "sizes": {
+    "small": {
+      "width": 300
+    },
+    "medium": {
+      "width": 600
+    },
+    "large": {
+      "width": 1200
+    }
+  }
+}

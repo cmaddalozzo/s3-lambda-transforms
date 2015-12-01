@@ -1,7 +1,7 @@
 var async = require('async');
 var AWS = require('aws-sdk');
 
-var sizes = ['small', 'medium', 'large'];
+var config = require('./lambdaConfig.json');
 
 var s3 = new AWS.S3();
  
@@ -24,7 +24,7 @@ exports.handler = function(event, context) {
   var baseKey = srcKey.match(/^orig\/(.*)/)[1];
 
   // Call a delete for each size.
-  async.each(sizes, function(size, cb){
+  async.each(Object.keys(config.sizes), function(size, cb){
     var key = size + '/' + baseKey;
     console.log('Delete ' + key);
     s3.deleteObject({

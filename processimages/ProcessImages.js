@@ -3,20 +3,10 @@ var AWS = require('aws-sdk');
 var gm = require('gm')
             .subClass({ imageMagick: true }); // Enable ImageMagick integration.
 
-var sizes = {
-  small: {
-    width: 300
-  },
-  medium: {
-    width: 600
-  },
-  large: {
-    width: 1200
-  }
-};
+var config = require('./lambdaConfig.json');
 
 var s3 = new AWS.S3();
- 
+
 exports.handler = function(event, context) {
   "use strict";
   // Read options from the event.
@@ -59,7 +49,7 @@ exports.handler = function(event, context) {
     },
     function transform(response, next) {
       var results = {};
-      async.forEachOf(sizes, function(dimensions, sizeName, cb){
+      async.forEachOf(config.sizes, function(dimensions, sizeName, cb){
         console.log('Processing ' + sizeName);
         gm(response.Body).size(function(err, size) {
           // Infer the scaling factor to avoid stretching the image unnaturally.
